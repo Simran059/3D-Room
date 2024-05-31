@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Room with Random Objects</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initializing the scene
+        const scene = new THREE.Scene();
+    
+        // Setting up the camera
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 20, 50);
+    
+        // Creating the renderer
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+    
+        // Adding room
+        const roomSize = 32; // 32x32 feet room for approximately 1000 sqft
+        const floorGeometry = new THREE.PlaneGeometry(roomSize, roomSize);
+        const floorMaterial = new THREE.MeshBasicMaterial({color: 0xaaaaaa, side: THREE.DoubleSide});
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        scene.add(floor);
+    
+        // Creating a random object
+        function createRandomObject() {
+            const geometries = [
+                new THREE.BoxGeometry(2, 2, 2),
+                new THREE.ConeGeometry(1, 2, 32),
+                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.CylinderGeometry(1, 1, 2, 32),
+                new THREE.TorusGeometry(1, 0.4, 16, 100),
+            ];
+            const materials = [
+                new THREE.MeshBasicMaterial({color: 0xff0000}),
+                new THREE.MeshBasicMaterial({color: 0x00ff00}),
+                new THREE.MeshBasicMaterial({color: 0x0000ff}),
+                new THREE.MeshBasicMaterial({color: 0xff00ff}),
+                new THREE.MeshBasicMaterial({color: 0xffff00}),               
+                new THREE.MeshBasicMaterial({color: 0x0095DD}),               
+
+            ];
+    
+            const geometry = geometries[Math.floor(Math.random() * geometries.length)];         //Adding geometry
+            const material = materials[Math.floor(Math.random() * materials.length)];           //Adding materal
+            const object = new THREE.Mesh(geometry, material);                                  //Creating mesh
+    
+            object.position.set(
+                (Math.random() - 0.5) * roomSize,
+                1,
+                (Math.random() - 0.5) * roomSize
+            );
+    
+            return object;
+        }
+    
+        // Adding random objects to the scene
+        const numObjects = 10; // Number of objects to add
+        for (let i = 0; i < numObjects; i++) {
+            const object = createRandomObject();
+            scene.add(object);
+        }
+    
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+    
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+    
+        // Rendering the scene
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+    
+        animate();
+    
+        // Handling window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+    
+</body>
+</html>
